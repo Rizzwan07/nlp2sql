@@ -1,0 +1,11 @@
+duckdb
+langgraph
+langgraph-prebuilt
+langchain
+langchain-openai
+langchain-groq
+langsmith
+fastapi
+uvicorn
+python-dotenv
+pydantic

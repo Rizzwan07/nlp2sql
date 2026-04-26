@@ -1,0 +1,45 @@
+{
+  "schema": "main",
+  "tables": [
+    {
+      "name": "users",
+      "description": "User accounts",
+      "columns": [
+        {"name": "id", "description": "Primary key"},
+        {"name": "name", "description": "User full name"},
+        {"name": "email", "description": "Email address"},
+        {"name": "country", "description": "Country name"},
+        {"name": "is_active", "description": "Account active status"},
+        {"name": "created_at", "description": "Account creation timestamp"}
+      ]
+    },
+    {
+      "name": "orders",
+      "description": "Customer orders",
+      "columns": [
+        {"name": "id", "description": "Primary key"},
+        {"name": "user_id", "description": "Foreign key to users"},
+        {"name": "product_name", "description": "Product name"},
+        {"name": "category", "description": "Product category"},
+        {"name": "quantity", "description": "Order quantity"},
+        {"name": "total", "description": "Order total amount"},
+        {"name": "status", "description": "Order status"},
+        {"name": "order_date", "description": "Order date"}
+      ]
+    },
+    {
+      "name": "products",
+      "description": "Product catalog",
+      "columns": [
+        {"name": "id", "description": "Primary key"},
+        {"name": "name", "description": "Product name"},
+        {"name": "category", "description": "Product category"},
+        {"name": "price", "description": "Product price"},
+        {"name": "stock", "description": "Stock quantity"}
+      ]
+    }
+  ],
+  "foreign_keys": {
+    "orders.user_id": "users.id"
+  }
+}

@@ -1,0 +1,14 @@
+.env
+.env.local
+__pycache__/
+*.py[cod]
+*.duckdb
+*.duckdb.wal
+node_modules/
+dist/
+.DS_Store
+*.log
+nlpevn/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
