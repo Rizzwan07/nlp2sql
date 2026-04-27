@@ -26,7 +26,7 @@ A natural language to SQL chatbot powered by Groq, LangGraph, and DuckDB.
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/nlp2sql.git
+git clone https://github.com/Rizzwan07/nlp2sql.git
 cd nlp2sql
 ```
 
@@ -35,7 +35,7 @@ cd nlp2sql
 ```bash
 # Windows
 python -m venv nlpevn
-.\nlpevn\Scripts\Activate.ps1
+.\nlpevn\Scripts\Activate
 
 # Linux/Mac
 python -m venv nlpevn
