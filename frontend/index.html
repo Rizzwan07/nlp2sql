@@ -1,74 +1,13 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NLP2SQL</title>
-    <link rel="stylesheet" href="https://esm.sh/index.css" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>🗄️</text></svg>" />
   </head>
   <body>
     <div id="root"></div>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script type="text/babel">
-      const { useState } = React;
-
-      const API_URL = 'http://localhost:8000';
-
-      function App() {
-        const [input, setInput] = useState('');
-        const [messages, setMessages] = useState([]);
-        const [loading, setLoading] = useState(false);
-
-        const sendMessage = async () => {
-          if (!input.trim()) return;
-          setLoading(true);
-          setMessages(prev => [...prev, { role: 'user', content: input }]);
-          const userInput = input;
-          setInput('');
-
-          try {
-            const res = await fetch(`${API_URL}/query`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ question: userInput })
-            });
-            const data = await res.json();
-            setMessages(prev => [...prev, { role: 'assistant', content: data.answer }]);
-          } catch {
-            setMessages(prev => [...prev, { role: 'assistant', content: 'Error connecting to server' }]);
-          }
-          setLoading(false);
-        };
-
-        return (
-          <div className="container">
-            <div className="chat">
-              {messages.map((msg, i) => (
-                <div key={i} className={`message ${msg.role}`}>
-                  {msg.content}
-                </div>
-              ))}
-            </div>
-            <div className="input-area">
-              <input
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && sendMessage()}
-                placeholder="Ask a question..."
-                disabled={loading}
-              />
-              <button onClick={sendMessage} disabled={loading}>
-                {loading ? '...' : 'Send'}
-              </button>
-            </div>
-          </div>
-        );
-      }
-
-      const root = ReactDOM.createRoot(document.getElementById('root'));
-      root.render(<App />);
-    </script>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
