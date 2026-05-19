@@ -1,4 +1,4 @@
-from backend.src.nlp2sql import query_database
+from backend.nlp2sql import query_database
 import os
 
 os.environ.setdefault('GROQ_API_KEY', os.getenv('GROQ_API_KEY', ''))

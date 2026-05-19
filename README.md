@@ -1,25 +1,36 @@
 # NLP2SQL
 
-A natural language to SQL chatbot powered by Groq, LangGraph, and DuckDB.
+A natural language to SQL chatbot with a React frontend, powered by Groq, LangGraph, and DuckDB. Ask questions in plain English and get answers with SQL, data tables, and interactive charts.
 
 ## Features
 
 - Natural language to SQL conversion using LangGraph agent
-- Groq LLM (llama-3.3-70b) for intelligent query understanding
+- Groq LLM (llama-3.3-70b-versatile) for intelligent query understanding
 - DuckDB for fast in-memory database operations
-- Chat history support for context-aware responses
+- React frontend with inline chart visualization (Recharts)
+- Query history sidebar
 - SQL validation (SELECT/UPDATE only - safe queries)
 - Natural language responses from query results
-- LangSmith tracing for debugging and monitoring
+- Auto-detect chart type (bar, line, pie, stat)
+- LangSmith tracing for debugging (optional)
 
 ## Tech Stack
 
-- **Python 3.11+**
-- **Groq** - LLM API (free tier available)
-- **LangGraph** - Agent orchestration
-- **DuckDB** - In-memory SQL database
-- **LangSmith** - Tracing (optional)
-- **FastAPI** - API server
+**Backend:**
+- Python 3.11+
+- Groq - LLM API (free tier available)
+- LangGraph - Agent orchestration
+- DuckDB - In-memory SQL database
+- FastAPI - API server
+- LangSmith - Tracing (optional)
+
+**Frontend:**
+- React 18 + TypeScript
+- Vite
+- Tailwind CSS
+- Recharts - Data visualization
+- Framer Motion - Animations
+- Lucide React - Icons
 
 ## Quick Start
 
@@ -42,70 +53,115 @@ python -m venv nlpevn
 source nlpevn/bin/activate
 ```
 
-### 3. Install Dependencies
+### 3. Install Backend Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Get API Keys
+### 4. Install Frontend Dependencies
 
-**Groq** (free tier): https://console.groq.com  
+```bash
+cd frontend
+npm install
+cd ..
+```
+
+### 5. Get API Keys
+
+**Groq** (free tier): https://console.groq.com
 **LangSmith** (optional): https://smith.langchain.com
 
-### 5. Configure Environment Variables
+### 6. Configure Environment Variables
 
 Copy `.env.example` to `.env` and add your keys:
 
 ```bash
-# .env file
 GROQ_API_KEY=your_groq_key_here
 LANGCHAIN_API_KEY=your_langsmith_key_here
 LANGCHAIN_TRACING_V2=true
 LANGCHAIN_PROJECT=nlp2sql
 ```
 
-### 6. Run Database Setup
+### 7. Run Database Setup
 
 ```bash
 python setup_db.py
 ```
 
-This creates sample data in `backend/src/database.duckdb` with tables:
+This creates sample data in `backend/database.duckdb` with tables:
 - users (50 rows)
 - orders (100 rows)
 - products (12 rows)
 
-### 7. Run the Application
+### 8. Run the Application
 
-**CLI (interactive):**
-```bash
-python nlp2sql.py
-```
-
-Then type your questions. Type `exit` to quit.
-
-**API Server:**
+Start the backend:
 ```bash
 python main.py
-# Open http://localhost:8000
 ```
 
-Test the API:
+Start the frontend (in a separate terminal):
 ```bash
-curl -X POST http://localhost:8000/query -H "Content-Type: application/json" -d '{"question": "How many users?"}'
+cd frontend
+npm run dev
 ```
+
+Open http://localhost:5173 in your browser.
 
 ## Example Questions
 
-Try these questions in the CLI:
+### Bar Charts
+- "Show total orders by category"
+- "Which products have stock below 50?"
+- "Show order quantity by product name"
+- "Total revenue per product category"
+- "Number of orders per status"
 
-- "How many users are there?"
-- "Show me all products"
-- "What are the top 5 orders by total?"
-- "List all users from USA"
+### Pie Charts
+- "Show orders by status"
+- "How many users per country?"
+- "Orders distribution by category"
+- "Active vs inactive users"
+- "Product distribution by category"
+
+### Line Charts
+- "Show orders over time by date"
+- "Daily order totals for the last month"
+- "Order count per day"
+- "Show cumulative order count by order_date"
+- "Total revenue by order date"
+
+### Stats (Single Value)
+- "How many active users are there?"
+- "What is the total revenue?"
 - "How many orders are pending?"
-- "Show me products with price less than 100"
+- "What is the average order total?"
+- "How many products do we have?"
+
+### Tables
+- "List all products with their prices"
+- "Top 5 orders by total amount"
+- "Show users from USA with their emails"
+- "List all pending orders"
+- "Show me all products in Electronics category"
+
+### Aggregations & Comparisons
+- "Which country has the most users?"
+- "What is the most ordered product?"
+- "Compare pending vs completed orders"
+- "Average order total by category"
+- "Which user has the most orders?"
+
+### Joins
+- "Show user names with their order totals"
+- "List users from USA with their order count"
+- "Which users have never ordered?"
+- "Show product names with total quantity ordered"
+
+### Updates
+- "Update user with id 1 to be inactive"
+- "Set all pending orders to completed"
 
 ## Database Schema
 
@@ -113,7 +169,7 @@ Try these questions in the CLI:
 
 | Column | Type | Description |
 |--------|------|-------------|
-| id | INTEGER | Primary key, auto-generated |
+| id | INTEGER | Primary key |
 | name | VARCHAR(255) | User full name |
 | email | VARCHAR(255) | Email address |
 | country | VARCHAR(100) | Country name |
@@ -124,7 +180,7 @@ Try these questions in the CLI:
 
 | Column | Type | Description |
 |--------|------|-------------|
-| id | INTEGER | Primary key, auto-generated |
+| id | INTEGER | Primary key |
 | user_id | INTEGER | Foreign key to users |
 | product_name | VARCHAR(255) | Product name |
 | category | VARCHAR(100) | Product category |
@@ -147,60 +203,75 @@ Try these questions in the CLI:
 
 ```
 nlp2sql/
-├── backend/src/
-│   ├── nlp2sql.py      # Core NLP2SQL engine
-│   ├── schema.json     # Database schema definition
-│   └── database.duckdb # DuckDB database file
-├─�� nlp2sql.py          # CLI runner (main entry point)
-├── main.py            # FastAPI server
-├── requirements.txt   # Python dependencies
-├── setup_db.py        # Database setup script
-├── .env              # Environment variables (gitignored)
-├── .env.example      # Template for .env
-├── .gitignore        # Git ignore rules
-└── README.md         # This file
+├── backend/
+│   ├── nlp2sql.py          # Core NLP2SQL engine (LangGraph pipeline)
+│   ├── schema.json         # Database schema definition
+│   └── database.duckdb     # DuckDB database file
+├── frontend/
+│   ├── src/
+│   │   ├── App.tsx
+│   │   ├── api/query.ts
+│   │   ├── components/
+│   │   │   ├── Chat/       # ChatArea, MessageBubble, InputBar, WelcomeScreen
+│   │   │   ├── Results/    # ChartView, DataTable, SqlBlock
+│   │   │   ├── Sidebar/    # QueryHistory
+│   │   │   └── Layout/     # Header
+│   │   ├── hooks/useChat.ts
+│   │   ├── types/index.ts
+│   │   └── utils/chartHelper.ts
+│   └── package.json
+├── nlp2sql.py              # CLI entry point
+├── main.py                 # FastAPI server
+├── setup_db.py             # Database seed script
+├── requirements.txt        # Python dependencies
+└── .env                    # Environment variables (gitignored)
 ```
 
 ## How It Works
-
-The NLP2SQL engine uses LangGraph to orchestrate the conversation flow:
 
 ```
 User Question
     │
     ▼
-┌─────────────────────────────────────┐
-│ generate_sql_node                   │
-│ (LLM generates SQL + uses tools)   │
-└─────────────────────────────────────┘
+┌─────────────────────────────┐
+│ generate_sql_node           │
+│ (LLM converts NL → SQL)    │
+└─────────────────────────────┘
     │
     ▼
-┌─────────────────────────────────────┐
-│ SQL Validation                     │
-│ (Checks: SELECT/UPDATE only)       │
-└─────────────────────────────────────┘
+┌─────────────────────────────┐
+│ SQL Validation              │
+│ (SELECT/UPDATE only)        │
+└─────────────────────────────┘
     │
-    ├── Valid ──► ┌──────────────────┐
-    │             │ execute_node      │
-    │             │ (Runs SQL on DB)   │
-    │             └──────────────────┘
-    │                    │
-    └───────────────────────────────► ┌──────────────────┐
-                                  │ format_node    │
-                                  │ (LLM formats  │
-                                  │  as natural   │
-                                  │  language)   │
-                                  └──────────────────┘
-                                        │
-                                        ▼
-                                   Final Answer
+    ├── Valid ──► execute_node (runs SQL on DuckDB)
+    │                  │
+    │                  ▼
+    │            format_node (LLM formats as natural language)
+    │                  │
+    │                  ▼
+    └──────────► Frontend renders answer + table + chart
 ```
 
-### Nodes
+## API
 
-1. **generate_sql_node** - Uses LLM to convert natural language to SQL
-2. **execute_node** - Runs the SQL on DuckDB
-3. **format_node** - Converts results back to natural language
+### POST /query
+
+```bash
+curl -X POST http://localhost:8000/query \
+  -H "Content-Type: application/json" \
+  -d '{"question": "How many users are there?"}'
+```
+
+Response:
+```json
+{
+  "answer": "There are 50 users in the database.",
+  "sql": "SELECT COUNT(*) as count FROM \"main\".\"users\" LIMIT 100;",
+  "columns": ["count"],
+  "rows": [{"count": 50}]
+}
+```
 
 ## Environment Variables
 
@@ -211,49 +282,30 @@ User Question
 | LANGCHAIN_TRACING_V2 | No | Set to "true" to enable tracing |
 | LANGCHAIN_PROJECT | No | Project name for LangSmith |
 
-## Known Limitations
-
-- Frontend not included yet (coming soon)
-- Prompt optimized for current schema - you can customize rules in `backend/src/nlp2sql.py`
-- Only SELECT and UPDATE queries allowed (for security)
-- Database resets on server restart (in-memory)
-
 ## Troubleshooting
 
-### "Model not found" error
-Update the model name in `backend/src/nlp2sql.py`:
+### "Rate limit reached" error
+The free Groq tier has a 100k tokens/day limit. Wait for reset or switch model in `backend/nlp2sql.py`:
 ```python
-llm = ChatGroq(model="llama-3.3-70b-versatile")
+llm = ChatGroq(model="llama-3.1-8b-instant")  # lower quality but separate limit
 ```
 
-### "Connection refused" error
-Make sure your API key is correct in `.env` file.
+### "Invalid API Key" error
+Check your `.env` file has the correct `GROQ_API_KEY`. Restart the backend after changing it.
 
-### Empty results
-Check that `setup_db.py` has run successfully and `database.duckdb` exists.
+### "Model not found" error
+Update the model name in `backend/nlp2sql.py`.
+
+### Empty chart / blank visualization
+Some queries return data that doesn't map well to charts. Try questions that return a category + numeric column.
+
+### Frontend can't connect
+Make sure the backend is running on port 8000 (`python main.py`) before starting the frontend.
 
 ## License
 
-MIT License
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+MIT
 
 ---
 
-Built with [Groq](https://groq.com) + [LangGraph](https://langgraph.ai) + [DuckDB](https://duckdb.org)
+Built with [Groq](https://groq.com) + [LangGraph](https://langgraph.ai) + [DuckDB](https://duckdb.org) + [React](https://react.dev) + [Recharts](https://recharts.org)

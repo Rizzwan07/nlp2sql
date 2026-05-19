@@ -2,7 +2,7 @@ import duckdb
 import random
 from datetime import datetime, timedelta
 
-conn = duckdb.connect('backend/src/database.duckdb')
+conn = duckdb.connect('backend/database.duckdb')
 
 conn.execute('DROP TABLE IF EXISTS orders')
 conn.execute('DROP TABLE IF EXISTS products')

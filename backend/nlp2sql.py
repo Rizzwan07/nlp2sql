@@ -574,4 +574,6 @@ def query_database(question: str, session_id: str = "default") -> dict:
     return {
         "answer": result.get("answer") or result.get("chat_answer") or result.get("error", "No response"),
         "sql": result.get("sql", ""),
+        "columns": result.get("columns", []),
+        "rows": result.get("rows", []),
     }

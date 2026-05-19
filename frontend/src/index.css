@@ -7,13 +7,78 @@ html, body, #root {
   margin: 0;
 }
 
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #94a3b8;
-  border-radius: 3px;
+  background: #d4d4d4;
+  border-radius: 10px;
+}
+
+@keyframes float-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.05); }
+  66% { transform: translate(-20px, 15px) scale(0.95); }
+}
+
+@keyframes float-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-25px, 20px) scale(0.95); }
+  66% { transform: translate(20px, -30px) scale(1.05); }
+}
+
+@keyframes float-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(20px, 25px) scale(1.03); }
+  66% { transform: translate(-30px, -15px) scale(0.97); }
+}
+
+.animated-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.animated-bg .blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.15;
+}
+
+.animated-bg .blob-1 {
+  width: 500px;
+  height: 500px;
+  background: #14b8a6;
+  top: -10%;
+  right: -5%;
+  animation: float-1 20s ease-in-out infinite;
+}
+
+.animated-bg .blob-2 {
+  width: 400px;
+  height: 400px;
+  background: #6366f1;
+  bottom: -5%;
+  left: -5%;
+  animation: float-2 25s ease-in-out infinite;
+}
+
+.animated-bg .blob-3 {
+  width: 350px;
+  height: 350px;
+  background: #f97316;
+  top: 40%;
+  left: 50%;
+  animation: float-3 22s ease-in-out infinite;
 }
