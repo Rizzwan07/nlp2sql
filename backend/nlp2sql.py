@@ -56,8 +56,14 @@ for table in _schema["tables"]:
     _SCHEMA_PROMPT += "Columns:\n"
     for col in table["columns"]:
         name = col["name"] if isinstance(col, dict) else col
+        col_type = col.get("type", "") if isinstance(col, dict) else ""
         desc = col.get("description", "") if isinstance(col, dict) else ""
-        _SCHEMA_PROMPT += f'  - "{name}": {desc}\n' if desc else f'  - "{name}"\n'
+        parts = [f'  - "{name}"']
+        if col_type:
+            parts.append(f"({col_type})")
+        if desc:
+            parts.append(f"— {desc}")
+        _SCHEMA_PROMPT += " ".join(parts) + "\n"
 
 _JOIN_PROMPT = ""
 if _foreign_keys:
@@ -425,7 +431,7 @@ CRITICAL RULES:
 7. UPDATE is allowed — generate proper UPDATE SQL with SET and WHERE clauses
 8. Never hallucinate column or table names — only use what is in the schema above
 9. Never generate code, explanations, or markdown — only SQL or CHAT response
-10. Date and time columns are stored as TEXT — use string comparison or ILIKE, never EXTRACT or timestamp functions e.g. use "BasicEndTime" ILIKE '12:00%' not EXTRACT(HOUR FROM ...)
+ 10. Column types are shown in the schema (DATE, TIMESTAMP, VARCHAR, INTEGER, DECIMAL, BOOLEAN). Use appropriate SQL functions per type — e.g. DATE_TRUNC, strftime for DATE columns; EXTRACT for TIMESTAMP columns. Do NOT use ILIKE on DATE/TIMESTAMP columns.
 11. Always call get_table_schema tool before generating UPDATE queries to verify column names exist
 
 RESPONSE FORMAT — output ONLY one of these, nothing else:
@@ -571,9 +577,11 @@ def query_database(question: str, session_id: str = "default") -> dict:
         "history": [],
     }
     result = graph.invoke(initial_state)
+    error = result.get("error") or result.get("response_type") == "error"
     return {
         "answer": result.get("answer") or result.get("chat_answer") or result.get("error", "No response"),
         "sql": result.get("sql", ""),
         "columns": result.get("columns", []),
         "rows": result.get("rows", []),
+        "error": bool(error),
     }

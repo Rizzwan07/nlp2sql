@@ -1,11 +1,15 @@
 import { motion } from 'framer-motion'
 import {
-  BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
+  BarChart, Bar, LineChart, Line, AreaChart, Area,
+  PieChart, Pie, Cell,
+  RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
+  ScatterChart, Scatter,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts'
 import { detectChartType, getChartDataKey } from '../../utils/chartHelper'
+import type { ChartType } from '../../types'
 
-const COLORS = ['#14b8a6', '#6366f1', '#f97316', '#ec4899', '#8b5cf6', '#06b6d4', '#eab308', '#ef4444']
+const COLORS = ['#22c55e', '#6366f1', '#f97316', '#ec4899', '#8b5cf6', '#06b6d4', '#eab308', '#ef4444']
 
 interface ChartViewProps {
   columns: string[]
@@ -16,13 +20,20 @@ export function ChartView({ columns, rows }: ChartViewProps) {
   const chartType = detectChartType(columns, rows)
   const { categoryKey, valueKeys } = getChartDataKey(columns, rows)
 
-  const data = rows.slice(0, 20).map((row) => {
+  const raw = rows.slice(0, 20).map((row) => {
     const item: Record<string, unknown> = { [categoryKey]: String(row[categoryKey] ?? '') }
     for (const key of valueKeys) {
       item[key] = Number(row[key]) || 0
     }
     return item
   })
+
+  const needsSort: ChartType[] = ['area', 'line']
+  const data = needsSort.includes(chartType)
+    ? raw.sort((a, b) => String(a[categoryKey]).localeCompare(String(b[categoryKey])))
+    : raw
+
+  const height = chartType === 'pie' ? 260 : chartType === 'radar' ? 280 : chartType === 'scatter' ? 250 : 200
 
   if (chartType === 'stat') {
     const value = rows[0]?.[columns[columns.length - 1]] ?? rows[0]?.[columns[0]]
@@ -44,7 +55,7 @@ export function ChartView({ columns, rows }: ChartViewProps) {
       transition={{ duration: 0.2 }}
       className="mt-3 bg-white border border-neutral-200 rounded-xl p-4"
     >
-      <ResponsiveContainer width="100%" height={chartType === 'pie' ? 260 : 200}>
+      <ResponsiveContainer width="100%" height={height}>
         {chartType === 'pie' ? (
           <PieChart margin={{ top: 30, right: 30, bottom: 30, left: 30 }}>
             <Pie
@@ -76,24 +87,51 @@ export function ChartView({ columns, rows }: ChartViewProps) {
             </Pie>
             <Tooltip />
           </PieChart>
-        ) : chartType === 'line' ? (
-          <LineChart data={data}>
+        ) : chartType === 'area' ? (
+          <AreaChart data={data}>
             <CartesianGrid vertical={false} stroke="#f0f0f0" />
             <XAxis dataKey={categoryKey} tick={{ fontSize: 11, fill: '#999' }} axisLine={false} tickLine={false} />
             <YAxis tick={{ fontSize: 11, fill: '#999' }} axisLine={false} tickLine={false} width={40} />
             <Tooltip />
             {valueKeys.map((key, i) => (
-              <Line
+              <Area
                 key={key}
-                type="natural"
+                type="monotone"
                 dataKey={key}
                 stroke={COLORS[i % COLORS.length]}
+                fill={COLORS[i % COLORS.length]}
+                fillOpacity={0.15}
                 strokeWidth={2}
                 dot={false}
-                strokeLinecap="round"
               />
             ))}
-          </LineChart>
+          </AreaChart>
+        ) : chartType === 'radar' ? (
+          <RadarChart data={data} cx="50%" cy="50%" outerRadius="70%">
+            <PolarGrid stroke="#e5e7eb" />
+            <PolarAngleAxis dataKey={categoryKey} tick={{ fontSize: 10, fill: '#666' }} />
+            <PolarRadiusAxis tick={{ fontSize: 9, fill: '#999' }} angle={30} domain={[0, 'auto']} />
+            <Tooltip />
+            {valueKeys.map((key, i) => (
+              <Radar
+                key={key}
+                name={key}
+                dataKey={key}
+                stroke={COLORS[i % COLORS.length]}
+                fill={COLORS[i % COLORS.length]}
+                fillOpacity={0.15}
+                strokeWidth={2}
+              />
+            ))}
+          </RadarChart>
+        ) : chartType === 'scatter' ? (
+          <ScatterChart>
+            <CartesianGrid stroke="#f0f0f0" />
+            <XAxis dataKey={valueKeys[0]} tick={{ fontSize: 11, fill: '#999' }} axisLine={false} tickLine={false} />
+            <YAxis dataKey={valueKeys[1]} tick={{ fontSize: 11, fill: '#999' }} axisLine={false} tickLine={false} width={40} />
+            <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+            <Scatter data={raw} fill={COLORS[0]} />
+          </ScatterChart>
         ) : (
           <BarChart data={data}>
             <CartesianGrid vertical={false} stroke="#f0f0f0" />

@@ -5,37 +5,37 @@
       "name": "users",
       "description": "User accounts",
       "columns": [
-        {"name": "id", "description": "Primary key"},
-        {"name": "name", "description": "User full name"},
-        {"name": "email", "description": "Email address"},
-        {"name": "country", "description": "Country name"},
-        {"name": "is_active", "description": "Account active status"},
-        {"name": "created_at", "description": "Account creation timestamp"}
+        {"name": "id", "type": "INTEGER", "description": "Primary key"},
+        {"name": "name", "type": "VARCHAR(255)", "description": "User full name"},
+        {"name": "email", "type": "VARCHAR(255)", "description": "Email address"},
+        {"name": "country", "type": "VARCHAR(100)", "description": "Country name"},
+        {"name": "is_active", "type": "BOOLEAN", "description": "Account active status"},
+        {"name": "created_at", "type": "TIMESTAMP", "description": "Account creation timestamp"}
       ]
     },
     {
       "name": "orders",
       "description": "Customer orders",
       "columns": [
-        {"name": "id", "description": "Primary key"},
-        {"name": "user_id", "description": "Foreign key to users"},
-        {"name": "product_name", "description": "Product name"},
-        {"name": "category", "description": "Product category"},
-        {"name": "quantity", "description": "Order quantity"},
-        {"name": "total", "description": "Order total amount"},
-        {"name": "status", "description": "Order status"},
-        {"name": "order_date", "description": "Order date"}
+        {"name": "id", "type": "INTEGER", "description": "Primary key"},
+        {"name": "user_id", "type": "INTEGER", "description": "Foreign key to users"},
+        {"name": "product_name", "type": "VARCHAR(255)", "description": "Product name"},
+        {"name": "category", "type": "VARCHAR(100)", "description": "Product category"},
+        {"name": "quantity", "type": "INTEGER", "description": "Order quantity"},
+        {"name": "total", "type": "DECIMAL(10,2)", "description": "Order total amount"},
+        {"name": "status", "type": "VARCHAR(50)", "description": "Order status"},
+        {"name": "order_date", "type": "DATE", "description": "Order date"}
       ]
     },
     {
       "name": "products",
       "description": "Product catalog",
       "columns": [
-        {"name": "id", "description": "Primary key"},
-        {"name": "name", "description": "Product name"},
-        {"name": "category", "description": "Product category"},
-        {"name": "price", "description": "Product price"},
-        {"name": "stock", "description": "Stock quantity"}
+        {"name": "id", "type": "INTEGER", "description": "Primary key"},
+        {"name": "name", "type": "VARCHAR(255)", "description": "Product name"},
+        {"name": "category", "type": "VARCHAR(100)", "description": "Product category"},
+        {"name": "price", "type": "DECIMAL(10,2)", "description": "Product price"},
+        {"name": "stock", "type": "INTEGER", "description": "Stock quantity"}
       ]
     }
   ],

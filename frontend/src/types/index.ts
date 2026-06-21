@@ -3,6 +3,7 @@ export interface QueryResponse {
   sql?: string
   columns?: string[]
   rows?: Record<string, unknown>[]
+  error?: boolean
 }
 
 export interface Message {
@@ -23,4 +24,4 @@ export interface HistoryEntry {
   timestamp: number
 }
 
-export type ChartType = 'bar' | 'line' | 'pie' | 'stat'
+export type ChartType = 'bar' | 'line' | 'area' | 'pie' | 'radar' | 'scatter' | 'stat'

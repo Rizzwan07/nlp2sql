@@ -11,7 +11,7 @@ A natural language to SQL chatbot with a React frontend, powered by Groq, LangGr
 - Query history sidebar
 - SQL validation (SELECT/UPDATE only - safe queries)
 - Natural language responses from query results
-- Auto-detect chart type (bar, line, pie, stat)
+- Auto-detect chart type (bar, line, pie, stat, area, radar, scatter)
 - LangSmith tracing for debugging (optional)
 
 ## Tech Stack
@@ -91,7 +91,7 @@ python setup_db.py
 
 This creates sample data in `backend/database.duckdb` with tables:
 - users (50 rows)
-- orders (100 rows)
+- orders (200 rows)
 - products (12 rows)
 
 ### 8. Run the Application
@@ -269,7 +269,8 @@ Response:
   "answer": "There are 50 users in the database.",
   "sql": "SELECT COUNT(*) as count FROM \"main\".\"users\" LIMIT 100;",
   "columns": ["count"],
-  "rows": [{"count": 50}]
+  "rows": [{"count": 50}],
+  "error": false
 }
 ```
 

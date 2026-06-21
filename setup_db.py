@@ -45,18 +45,21 @@ for i, (name, cat, price, stock) in enumerate(products_list, 1):
 products = ['Laptop', 'Headphones', 'Keyboard', 'Mouse', 'Monitor', 'Desk Chair', 'Desk', 'Lamp', 'Notebook', 'Pen Set']
 categories = ['Electronics', 'Electronics', 'Electronics', 'Electronics', 'Electronics', 'Furniture', 'Furniture', 'Furniture', 'Office', 'Office']
 statuses = ['pending', 'completed', 'cancelled', 'shipped']
+status_weights = [0.3, 0.35, 0.15, 0.2]
 
-for i in range(1, 101):
+product_weights = [0.15, 0.12, 0.1, 0.08, 0.08, 0.06, 0.06, 0.1, 0.12, 0.13]
+
+for i in range(1, 201):
     user_id = random.randint(1, 50)
-    idx = random.randint(0, len(products)-1)
+    idx = random.choices(range(len(products)), weights=product_weights, k=1)[0]
     product_name = products[idx]
     category = categories[idx]
     qty = random.randint(1, 5)
     total_val = round(random.uniform(10, 1000), 2)
-    status = random.choice(statuses)
+    status = random.choices(statuses, weights=status_weights, k=1)[0]
     order_date = (datetime.now() - timedelta(days=random.randint(1, 180))).strftime('%Y-%m-%d')
     conn.execute(f"INSERT INTO orders VALUES ({i}, {user_id}, '{product_name}', '{category}', {qty}, {total_val}, '{status}', '{order_date}')")
 
 conn.close()
 print('Database created!')
-print('Tables: users (50), orders (100), products (12)')
+print('Tables: users (50), orders (200), products (12)')

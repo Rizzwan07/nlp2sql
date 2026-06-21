@@ -19,7 +19,7 @@ function classifyColumns(columns: string[], rows: Record<string, unknown>[]) {
     const sample = rows.slice(0, 3)
     const firstVal = sample[0]?.[col]
 
-    if (typeof firstVal === 'string' && /^\d{4}-\d{2}-\d{2}/.test(firstVal)) {
+    if (typeof firstVal === 'string' && /^\d{4}-\d{2}(-\d{2})?$/.test(firstVal)) {
       dateCols.push(col)
     } else if (sample.every((r) => isNumeric(r[col]))) {
       numericCols.push(col)
@@ -37,15 +37,17 @@ export function detectChartType(columns: string[], rows: Record<string, unknown>
 
   const { numericCols, stringCols, dateCols } = classifyColumns(columns, rows)
 
-  if (dateCols.length >= 1 && numericCols.length >= 1) return 'line'
+  if (numericCols.length >= 2 && stringCols.length === 0 && dateCols.length === 0) return 'scatter'
+  if (stringCols.length >= 1 && numericCols.length >= 3 && rows.length <= 10 && dateCols.length === 0) return 'radar'
   if (stringCols.length >= 1 && numericCols.length === 1 && rows.length <= 8) return 'pie'
+  if (dateCols.length >= 1 && numericCols.length >= 1 && rows.length > 5) return 'area'
   if (stringCols.length >= 1 && numericCols.length >= 1) return 'bar'
   if (numericCols.length >= 1) return 'bar'
 
   return 'stat'
 }
 
-export function getChartDataKey(columns: string[], rows: Record<string, unknown>[]): { categoryKey: string; valueKeys: string[] } {
+export function getChartDataKey(columns: string[], rows: Record<string, unknown>[]): { categoryKey: string; valueKeys: string[]; xKey?: string; yKey?: string } {
   const { numericCols, stringCols, dateCols } = classifyColumns(columns, rows)
 
   let categoryKey: string
@@ -63,10 +65,10 @@ export function getChartDataKey(columns: string[], rows: Record<string, unknown>
   const valueKeys = numericCols.filter((c) => c !== categoryKey)
 
   // if we have too many value keys, pick the most likely meaningful ones (prefer stock, total, price, quantity, count)
-  if (valueKeys.length > 2) {
+  if (valueKeys.length > 4) {
     const preferred = valueKeys.filter((c) => /stock|total|price|quantity|count|amount/i.test(c))
-    if (preferred.length > 0) return { categoryKey, valueKeys: preferred.slice(0, 2) }
-    return { categoryKey, valueKeys: valueKeys.slice(0, 2) }
+    if (preferred.length > 0) return { categoryKey, valueKeys: preferred.slice(0, 4) }
+    return { categoryKey, valueKeys: valueKeys.slice(0, 4) }
   }
 
   return { categoryKey, valueKeys: valueKeys.length ? valueKeys : [numericCols[0] || columns[1] || columns[0]] }

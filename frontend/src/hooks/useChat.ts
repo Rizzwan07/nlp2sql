@@ -26,13 +26,15 @@ export function useChat() {
 
     try {
       const data = await askQuestion(question.trim())
+      const isError = data.error || /rate limit|error:|database error|not permitted/i.test(data.answer || '')
       const assistantMsg: Message = {
         id: genId(),
         role: 'assistant',
-        content: data.answer || 'No response',
+        content: isError ? friendlyError(data.answer || '') : data.answer || 'No response',
         sql: data.sql || undefined,
         columns: data.columns,
         rows: data.rows,
+        error: isError,
         timestamp: Date.now(),
       }
       setMessages((prev) => [...prev, assistantMsg])
@@ -61,4 +63,12 @@ export function useChat() {
   }, [])
 
   return { messages, history, loading, sendMessage, toggleChart, newChat }
+}
+
+function friendlyError(raw: string): string {
+  if (/rate limit/i.test(raw)) return 'The AI service is temporarily rate-limited. Please wait a moment and try again.'
+  if (/database error/i.test(raw)) return 'A database error occurred while processing your query. Please try rephrasing.'
+  if (/not permitted/i.test(raw)) return 'That operation is not permitted. Only SELECT, WITH, and UPDATE queries are allowed.'
+  if (/no matching/i.test(raw)) return 'No matching records found.'
+  return 'Something went wrong. Please try again.'
 }
